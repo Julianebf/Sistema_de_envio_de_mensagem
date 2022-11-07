@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Mail; 
+use App\Mail\email_confirm_message;
 use App\Models\Menssagen;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -36,16 +38,21 @@ class Main extends Controller
             ]
         );
 
-        $purl_code = Str::random(52);
+        $purl_code = Str::random(32);
 
         $mensagen = new Menssagen();
         $mensagen->send_from = $request->text_from;
-        $mensagen->send_from = $request->text_to;
-        $mensagen->send_from = $request->text_form;
+        $mensagen->send_to = $request->text_to;
+        $mensagen->mensagen = $request->text_message;
         $mensagen->purl_confirmation = $purl_code;
         $mensagen->save();
 
+        Mail::to($request->text_from)->send(new email_confirm_message($purl_code));
+
+        echo "terminado";
+
     }
+   
 
     public function confirm($purl){
         echo 'confir';
